@@ -38,6 +38,10 @@ import org.apache.ibatis.reflection.ArrayUtil;
  * @author Clinton Begin
  * @author Eduardo Macarron
  */
+
+/**
+ * 所有的日志接口父类 -- 抽象基类
+ */
 public abstract class BaseJdbcLogger {
 
   protected static final Set<String> SET_METHODS;

@@ -18,6 +18,7 @@ package org.apache.ibatis.logging;
 /**
  * @author Clinton Begin
  */
+//适配器模式  -- 提供日志
 public interface Log {
 
   boolean isDebugEnabled();

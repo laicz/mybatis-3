@@ -25,6 +25,7 @@ import org.apache.ibatis.logging.Log;
  */
 public class Jdk14LoggingImpl implements Log {
 
+  //真正起作用的对象
   private final Logger log;
 
   public Jdk14LoggingImpl(String clazz) {

@@ -28,8 +28,14 @@ public final class LogFactory {
    */
   public static final String MARKER = "MYBATIS";
 
+  /**
+   * 构造函数
+   */
   private static Constructor<? extends Log> logConstructor;
 
+  /**
+   * 优选日志提供者
+   */
   static {
     tryImplementation(LogFactory::useSlf4jLogging);
     tryImplementation(LogFactory::useCommonsLogging);

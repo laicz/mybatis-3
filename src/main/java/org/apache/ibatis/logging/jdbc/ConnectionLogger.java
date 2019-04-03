@@ -41,10 +41,19 @@ public final class ConnectionLogger extends BaseJdbcLogger implements Invocation
     this.connection = conn;
   }
 
+  /**
+   * 对普通的连接进行增强
+   * @param proxy
+   * @param method
+   * @param params
+   * @return
+   * @throws Throwable
+   */
   @Override
   public Object invoke(Object proxy, Method method, Object[] params)
       throws Throwable {
     try {
+      //如果是从Object继承的方法直接忽略
       if (Object.class.equals(method.getDeclaringClass())) {
         return method.invoke(this, params);
       }
