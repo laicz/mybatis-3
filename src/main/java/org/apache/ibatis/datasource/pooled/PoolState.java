@@ -36,6 +36,9 @@ public class PoolState {
    * 正在使用连接
    */
   protected final List<PooledConnection> activeConnections = new ArrayList<>();
+  /**
+   * 请求的次数
+   */
   protected long requestCount = 0;
   protected long accumulatedRequestTime = 0;
   protected long accumulatedCheckoutTime = 0;

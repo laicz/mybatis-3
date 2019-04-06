@@ -91,13 +91,18 @@ public class BlockingCache implements Cache {
     return null;
   }
 
+  /**
+   * 如果不存在 reentrantLock，则放入一个新锁
+   * @param key
+   * @return
+   */
   private ReentrantLock getLockForKey(Object key) {
     return locks.computeIfAbsent(key, k -> new ReentrantLock());
   }
 
   private void acquireLock(Object key) {
-    Lock lock = getLockForKey(key);
-    if (timeout > 0) {
+    Lock lock = getLockForKey(key); //获取到锁
+    if (timeout > 0) {    //如果有设置获取锁的失效时间，则尝试获取锁并设置草超时时间
       try {
         boolean acquired = lock.tryLock(timeout, TimeUnit.MILLISECONDS);
         if (!acquired) {

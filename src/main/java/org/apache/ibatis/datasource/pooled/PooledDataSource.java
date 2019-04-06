@@ -34,6 +34,7 @@ import org.apache.ibatis.logging.LogFactory;
 /**
  * This is a simple, synchronous, thread-safe database connection pool.
  * mybatis自带的连接池
+ *
  * @author Clinton Begin
  */
 public class PooledDataSource implements DataSource {
@@ -48,15 +49,20 @@ public class PooledDataSource implements DataSource {
     private final UnpooledDataSource dataSource;
 
     // OPTIONAL CONFIGURATION FIELDS
+    //最大活跃连接
     protected int poolMaximumActiveConnections = 10;
+    //最大空闲连接
     protected int poolMaximumIdleConnections = 5;
     protected int poolMaximumCheckoutTime = 20000;
     protected int poolTimeToWait = 20000;
     protected int poolMaximumLocalBadConnectionTolerance = 3;
+    //测试数据库连接是否有效的测试语句
     protected String poolPingQuery = "NO PING QUERY SET";
+    //是否通过 ping 测试连接是否可用
     protected boolean poolPingEnabled;
     protected int poolPingConnectionsNotUsedFor;
 
+    //根据数据库 URL，用户名， 密码生成一个唯一的hash值，由这个连接池生成的连接都会带上这个值
     private int expectedConnectionTypeCode;
 
     public PooledDataSource() {
@@ -176,9 +182,7 @@ public class PooledDataSource implements DataSource {
      * The maximum number of tolerance for bad connection happens in one thread
      * which are applying for new {@link PooledConnection}.
      *
-     * @param poolMaximumLocalBadConnectionTolerance
-     * max tolerance for bad connection happens in one thread
-     *
+     * @param poolMaximumLocalBadConnectionTolerance max tolerance for bad connection happens in one thread
      * @since 3.4.5
      */
     public void setPoolMaximumLocalBadConnectionTolerance(
@@ -346,6 +350,12 @@ public class PooledDataSource implements DataSource {
         return ("" + url + username + password).hashCode();
     }
 
+    /**
+     * 关闭连接 -- 线程池重新回收连接
+     *
+     * @param conn
+     * @throws SQLException
+     */
     protected void pushConnection(PooledConnection conn) throws SQLException {
 
         synchronized (state) {
@@ -356,6 +366,8 @@ public class PooledDataSource implements DataSource {
                     if (!conn.getRealConnection().getAutoCommit()) {
                         conn.getRealConnection().rollback();
                     }
+                    //为什么使用真正的连接再次创建一个新的连接，将老的代理连接设置为不可用
+                    //我猜想的意思是  包装连接在上一次使用过后，会调用close方法关闭连接，所以下次不会再使用相同的了解，模拟出一个新的代理连接
                     PooledConnection newConn = new PooledConnection(conn.getRealConnection(), this);
                     state.idleConnections.add(newConn);
                     newConn.setCreatedTimestamp(conn.getCreatedTimestamp());
@@ -366,6 +378,7 @@ public class PooledDataSource implements DataSource {
                     }
                     state.notifyAll();
                 } else {
+                    //如果时间超过，则直接关闭真正的连接
                     state.accumulatedCheckoutTime += conn.getCheckoutTime();
                     if (!conn.getRealConnection().getAutoCommit()) {
                         conn.getRealConnection().rollback();
@@ -385,6 +398,14 @@ public class PooledDataSource implements DataSource {
         }
     }
 
+    /**
+     * 从连接池中获取连接
+     *
+     * @param username
+     * @param password
+     * @return
+     * @throws SQLException
+     */
     private PooledConnection popConnection(String username, String password) throws SQLException {
         boolean countedWait = false;
         PooledConnection conn = null;
@@ -393,6 +414,7 @@ public class PooledDataSource implements DataSource {
 
         while (conn == null) {
             synchronized (state) {
+                //如果存在空闲连接资源，则从空闲连接队列中获取一个连接
                 if (!state.idleConnections.isEmpty()) {
                     // Pool has available connection
                     conn = state.idleConnections.remove(0);
@@ -400,6 +422,7 @@ public class PooledDataSource implements DataSource {
                         log.debug("Checked out connection " + conn.getRealHashCode() + " from pool.");
                     }
                 } else {
+                    //如果不存在，如果小于最大连接池
                     // Pool does not have available connection
                     if (state.activeConnections.size() < poolMaximumActiveConnections) {
                         // Can create new connection
@@ -411,6 +434,7 @@ public class PooledDataSource implements DataSource {
                         // Cannot create new connection
                         PooledConnection oldestActiveConnection = state.activeConnections.get(0);
                         long longestCheckoutTime = oldestActiveConnection.getCheckoutTime();
+                        //如果最老的连接超时，则关闭连接
                         if (longestCheckoutTime > poolMaximumCheckoutTime) {
                             // Can claim overdue connection
                             state.claimedOverdueConnectionCount++;
@@ -432,6 +456,7 @@ public class PooledDataSource implements DataSource {
                                     log.debug("Bad connection. Could not roll back");
                                 }
                             }
+                            //使用真正的连接创建一个代理连接，构造一个新的连接资源
                             conn = new PooledConnection(oldestActiveConnection.getRealConnection(), this);
                             conn.setCreatedTimestamp(oldestActiveConnection.getCreatedTimestamp());
                             conn.setLastUsedTimestamp(oldestActiveConnection.getLastUsedTimestamp());
@@ -440,6 +465,9 @@ public class PooledDataSource implements DataSource {
                                 log.debug("Claimed overdue connection " + conn.getRealHashCode() + ".");
                             }
                         } else {
+                            /**
+                             *等到连接被释放
+                             */
                             // Must wait
                             try {
                                 if (!countedWait) {
@@ -471,6 +499,7 @@ public class PooledDataSource implements DataSource {
                         state.requestCount++;
                         state.accumulatedRequestTime += System.currentTimeMillis() - t;
                     } else {
+                        //如果获取失败，则进行重试，超过重试次数则抛出异常
                         if (log.isDebugEnabled()) {
                             log.debug("A bad connection (" + conn.getRealHashCode() + ") was returned from the pool, getting another connection.");
                         }

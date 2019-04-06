@@ -46,14 +46,14 @@ import org.apache.ibatis.reflection.property.PropertyNamer;
  */
 public class Reflector {
 
-  private final Class<?> type;
-  private final String[] readablePropertyNames;
-  private final String[] writablePropertyNames;
-  private final Map<String, Invoker> setMethods = new HashMap<>();
-  private final Map<String, Invoker> getMethods = new HashMap<>();
-  private final Map<String, Class<?>> setTypes = new HashMap<>();
-  private final Map<String, Class<?>> getTypes = new HashMap<>();
-  private Constructor<?> defaultConstructor;
+  private final Class<?> type;    //对应的类型
+  private final String[] readablePropertyNames;   //可读的属性
+  private final String[] writablePropertyNames;   //可写的属性
+  private final Map<String, Invoker> setMethods = new HashMap<>();  //set方法
+  private final Map<String, Invoker> getMethods = new HashMap<>();  //get方法
+  private final Map<String, Class<?>> setTypes = new HashMap<>();   //设置属性的参数类型
+  private final Map<String, Class<?>> getTypes = new HashMap<>();   //返回结果的数据类型
+  private Constructor<?> defaultConstructor;    //默认构造函数
 
   private Map<String, String> caseInsensitivePropertyMap = new HashMap<>();
 
@@ -62,6 +62,7 @@ public class Reflector {
     addDefaultConstructor(clazz);
     addGetMethods(clazz);
     addSetMethods(clazz);
+    //处理没有get set方法的属性
     addFields(clazz);
     readablePropertyNames = getMethods.keySet().toArray(new String[getMethods.keySet().size()]);
     writablePropertyNames = setMethods.keySet().toArray(new String[setMethods.keySet().size()]);
@@ -259,6 +260,10 @@ public class Reflector {
     }
   }
 
+  /**
+   * 生成set方法
+   * @param field
+   */
   private void addSetField(Field field) {
     if (isValidPropertyName(field.getName())) {
       setMethods.put(field.getName(), new SetFieldInvoker(field));
@@ -267,6 +272,10 @@ public class Reflector {
     }
   }
 
+  /**
+   * 生成get方法
+   * @param field
+   */
   private void addGetField(Field field) {
     if (isValidPropertyName(field.getName())) {
       getMethods.put(field.getName(), new GetFieldInvoker(field));

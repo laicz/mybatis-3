@@ -253,6 +253,7 @@ class PooledConnection implements InvocationHandler {
         // throw an SQLException instead of a Runtime
         checkConnection();
       }
+      //由真正的连接去执行操作
       return method.invoke(realConnection, args);
     } catch (Throwable t) {
       throw ExceptionUtil.unwrapThrowable(t);

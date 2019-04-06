@@ -23,6 +23,11 @@ import java.util.StringJoiner;
 import org.apache.ibatis.reflection.ArrayUtil;
 
 /**
+ * 缓存对象key值对象
+ * ①：命名空间和id相同（MappedStatement的Id）
+ * ②：指定查询结果集的范围（分页信息）
+ * ③：查询所使用的SQL
+ * ④：用户传递给SQL语句的实际参数
  * @author Clinton Begin
  */
 public class CacheKey implements Cloneable, Serializable {
@@ -34,10 +39,10 @@ public class CacheKey implements Cloneable, Serializable {
   private static final int DEFAULT_MULTIPLYER = 37;
   private static final int DEFAULT_HASHCODE = 17;
 
-  private final int multiplier;
-  private int hashcode;
-  private long checksum;
-  private int count;
+  private final int multiplier;  //计算hash的乘数
+  private int hashcode;   //hash值
+  private long checksum;  //hash值得和
+  private int count;  //updateList的中的元素
   // 8/21/2017 - Sonarlint flags this as needing to be marked transient.  While true if content is not serializable, this is not always true and thus should not be marked transient.
   private List<Object> updateList;
 

@@ -39,6 +39,7 @@ public interface ObjectFactory {
   <T> T create(Class<T> type);
 
   /**
+   * 使用指定的构造函数和参数构建构造对象
    * Creates a new object with the specified constructor and params.
    * @param type Object type
    * @param constructorArgTypes Constructor argument types
