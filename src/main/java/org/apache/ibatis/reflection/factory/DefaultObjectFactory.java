@@ -35,6 +35,7 @@ import org.apache.ibatis.reflection.ReflectionException;
 import org.apache.ibatis.reflection.Reflector;
 
 /**
+ * 获取指定对象的实例
  * @author Clinton Begin
  */
 public class DefaultObjectFactory implements ObjectFactory, Serializable {
@@ -112,6 +113,12 @@ public class DefaultObjectFactory implements ObjectFactory, Serializable {
     return classToCreate;
   }
 
+  /**
+   * 判断指定对象是否是继承Collection
+   * @param type Object type
+   * @param <T>
+   * @return
+   */
   @Override
   public <T> boolean isCollection(Class<T> type) {
     return Collection.class.isAssignableFrom(type);

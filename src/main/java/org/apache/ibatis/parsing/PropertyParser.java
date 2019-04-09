@@ -71,6 +71,7 @@ public class PropertyParser {
       return (variables == null) ? defaultValue : variables.getProperty(key, defaultValue);
     }
 
+
     @Override
     public String handleToken(String content) {
       if (variables != null) {
