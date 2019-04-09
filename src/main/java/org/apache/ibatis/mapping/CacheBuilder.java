@@ -38,6 +38,9 @@ import org.apache.ibatis.reflection.SystemMetaObject;
  * @author Clinton Begin
  */
 public class CacheBuilder {
+  /**
+   * current name space
+   */
   private final String id;
   private Class<? extends Cache> implementation;
   private final List<Class<? extends Cache>> decorators;
@@ -89,6 +92,10 @@ public class CacheBuilder {
     return this;
   }
 
+  /**
+   * 使用构造者模式动态的构建使用 装饰者莫模式的缓存对象
+   * @return
+   */
   public Cache build() {
     setDefaultImplementations();
     Cache cache = newBaseCacheInstance(implementation, id);

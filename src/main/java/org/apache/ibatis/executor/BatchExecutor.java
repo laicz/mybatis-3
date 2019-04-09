@@ -84,10 +84,15 @@ public class BatchExecutor extends BaseExecutor {
     Statement stmt = null;
     try {
       flushStatements();
+      //获取到configuration对象
       Configuration configuration = ms.getConfiguration();
+      //通过configuration对象获取到StatementHandler对象
       StatementHandler handler = configuration.newStatementHandler(wrapper, ms, parameterObject, rowBounds, resultHandler, boundSql);
+      //获取到日志增强的连接对象
       Connection connection = getConnection(ms.getStatementLog());
+      //获取到PreparedStatement对象
       stmt = handler.prepare(connection, transaction.getTimeout());
+      //给SQL语句中的占位符？设置值
       handler.parameterize(stmt);
       return handler.query(stmt, resultHandler);
     } finally {

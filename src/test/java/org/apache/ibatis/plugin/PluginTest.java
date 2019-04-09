@@ -40,6 +40,7 @@ class PluginTest {
   }
 
   @Intercepts({
+          //指定需要拦截类的方法信息
       @Signature(type = Map.class, method = "get", args = {Object.class})})
   public static class AlwaysMapPlugin implements Interceptor {
     @Override
@@ -47,6 +48,11 @@ class PluginTest {
       return "Always";
     }
 
+    /**
+     * 生成动态代理对象的阈值
+     * @param target
+     * @return
+     */
     @Override
     public Object plugin(Object target) {
       return Plugin.wrap(target, this);
