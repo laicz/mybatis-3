@@ -142,6 +142,9 @@ public class Configuration {
    */
   protected Class<?> configurationFactory;
 
+  /**
+   * 接口动态代理注册对象
+   */
   protected final MapperRegistry mapperRegistry = new MapperRegistry(this);
   protected final InterceptorChain interceptorChain = new InterceptorChain();
   protected final TypeHandlerRegistry typeHandlerRegistry = new TypeHandlerRegistry();

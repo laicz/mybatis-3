@@ -136,6 +136,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
         .blocking(blocking)
         .properties(props)
         .build();
+    //将缓存添加至configuration中，这里是以cache的id字段作为标识(即currentNamespace)
     configuration.addCache(cache);
     currentCache = cache;
     return cache;

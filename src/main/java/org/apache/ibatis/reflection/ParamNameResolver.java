@@ -45,6 +45,7 @@ public class ParamNameResolver {
    * <li>aMethod(int a, RowBounds rb, int b) -&gt; {{0, "0"}, {2, "1"}}</li>
    * </ul>
    */
+  //防止参数的位置和对应的值
   private final SortedMap<Integer, String> names;
 
   private boolean hasParamAnnotation;

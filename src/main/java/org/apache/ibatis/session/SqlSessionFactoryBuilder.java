@@ -26,6 +26,7 @@ import org.apache.ibatis.executor.ErrorContext;
 import org.apache.ibatis.session.defaults.DefaultSqlSessionFactory;
 
 /**
+ * 这个类可以被实例化，使用，丢弃，一旦使用这个类创建了SqlSessionFactory，这个类就可以不再使用，进行丢弃
  * Builds {@link SqlSession} instances.
  *
  * @author Clinton Begin
