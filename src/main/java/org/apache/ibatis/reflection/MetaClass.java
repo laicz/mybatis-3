@@ -27,6 +27,9 @@ import org.apache.ibatis.reflection.invoker.MethodInvoker;
 import org.apache.ibatis.reflection.property.PropertyTokenizer;
 
 /**
+ * 基于ReflectorFactory和Reflector提供类的各种骚操作
+ * 类的源数据
+ *
  * @author Clinton Begin
  */
 public class MetaClass {
@@ -39,15 +42,34 @@ public class MetaClass {
         this.reflector = reflectorFactory.findForClass(type);
     }
 
+    /**
+     * 获取类的源数据
+     *
+     * @param type
+     * @param reflectorFactory
+     * @return
+     */
     public static MetaClass forClass(Class<?> type, ReflectorFactory reflectorFactory) {
         return new MetaClass(type, reflectorFactory);
     }
 
+    /**
+     * 获取类的属性的源数据
+     *
+     * @param name
+     * @return
+     */
     public MetaClass metaClassForProperty(String name) {
         Class<?> propType = reflector.getGetterType(name);
         return MetaClass.forClass(propType, reflectorFactory);
     }
 
+    /**
+     * 获取属性名称
+     *
+     * @param name
+     * @return
+     */
     public String findProperty(String name) {
         StringBuilder prop = buildProperty(name, new StringBuilder());
         return prop.length() > 0 ? prop.toString() : null;
@@ -60,14 +82,30 @@ public class MetaClass {
         return findProperty(name);
     }
 
+    /**
+     * 获取对象的可读属性
+     *
+     * @return
+     */
     public String[] getGetterNames() {
         return reflector.getGetablePropertyNames();
     }
 
+    /**
+     * 获取对象的可写属性
+     *
+     * @return
+     */
     public String[] getSetterNames() {
         return reflector.getSetablePropertyNames();
     }
 
+    /**
+     * 获取set方法设置的类型
+     *
+     * @param name
+     * @return
+     */
     public Class<?> getSetterType(String name) {
         PropertyTokenizer prop = new PropertyTokenizer(name);
         if (prop.hasNext()) {
@@ -78,6 +116,12 @@ public class MetaClass {
         }
     }
 
+    /**
+     * 获取get方法设置的对象类型
+     *
+     * @param name
+     * @return
+     */
     public Class<?> getGetterType(String name) {
         PropertyTokenizer prop = new PropertyTokenizer(name);
         if (prop.hasNext()) {
