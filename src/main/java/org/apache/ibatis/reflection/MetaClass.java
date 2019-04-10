@@ -75,6 +75,13 @@ public class MetaClass {
         return prop.length() > 0 ? prop.toString() : null;
     }
 
+    /**
+     * 下划线转驼峰命名法
+     *
+     * @param name
+     * @param useCamelCaseMapping
+     * @return
+     */
     public String findProperty(String name, boolean useCamelCaseMapping) {
         if (useCamelCaseMapping) {
             name = name.replace("_", "");
